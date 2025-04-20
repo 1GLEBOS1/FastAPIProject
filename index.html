@@ -4,19 +4,37 @@
     <meta charset="UTF-8">
     <title>Title</title>
     <script>
-        form = new FormData();
-form.append("file", myFile);
-let response = await fetch('/uploadfile/', {
-    method: 'POST',
-    body: form
-    });
+                document.addEventListener("DOMContentLoaded", function () {
+            const formElement = document.querySelector("form");
+            const fileInput = document.querySelector('input[name="file1"]');
+                formElement.addEventListener("submit", async function (event) {
+                event.preventDefault(); // Prevent default form submission
 
-    let result = await response.json();
+                const files = fileInput.files;
+                const formData = new FormData();
+
+                for (let i = 0; i < files.length; i++) {
+                    formData.append("files", files[i]);  // field name must match server-side
+                }
+
+                let response = await fetch('/uploadfile/', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (response.redirected) {
+                    window.location.href = response.url;  // follow redirect to download page
+                } else {
+                    let result = await response.json();
+                    console.log(result);
+                }
+            });
+        });
     </script>
 </head>
 <body>
     <form action="/uploadfile/" enctype="multipart/form-data" method="post">
-        <input name="file" type="file">
+        <input name="file1" type="file" multiple>
         <input type="submit">
     </form>
 </body>
