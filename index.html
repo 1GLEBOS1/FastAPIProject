@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script>
+        form = new FormData();
+form.append("file", myFile);
+let response = await fetch('/uploadfile/', {
+    method: 'POST',
+    body: form
+    });
+
+    let result = await response.json();
+    </script>
+</head>
+<body>
+    <form action="/uploadfile/" enctype="multipart/form-data" method="post">
+        <input name="file" type="file">
+        <input type="submit">
+    </form>
+</body>
+</html>
