@@ -3,12 +3,9 @@ from db import Base
 from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import Session
 from bcrypt import hashpw, gensalt
-from security import verify_password, get_password_hash
 
 def hashed(s: str) -> str:
     return hashpw(s.encode('utf-8'), gensalt()).decode('utf-8')
-
-print(hashed)  # Stored in database
 
 class Users(Base):
     __tablename__ = 'users'
@@ -19,8 +16,8 @@ class Users(Base):
     hash_password = Column(String, nullable=False)
 
 def create_user(db: Session, name: str, email: str, password: str):
-    hashed_password = get_password_hash(password)
-    user = Users(name=name, email=email, hash_password=hashed_password)
+
+    user = Users(name=name, email=email, hash_password=hashed(password))
     db.add(user)
     db.commit()
     db.refresh(user)
@@ -29,14 +26,6 @@ def create_user(db: Session, name: str, email: str, password: str):
 
 def get_user_by_email(db: Session, email: str):
     return db.query(Users).filter(Users.email == email).first()
-
-def authenticate_user(db: Session, email: str, password: str):
-    user = get_user_by_email(db, email)
-    if not user:
-        return False
-    if not verify_password(password, user.hash_password):
-        return False
-    return user
 
 def update_user(db: Session, user: Users, name: Optional[str], email: Optional[str], password: Optional[str]):
     if name is not None:
